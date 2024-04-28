@@ -14,6 +14,7 @@
     let manifest = await axios.post("http://127.0.0.1:3000/manifest", {
       name, description, image_uri
     }).then(res => res.data)
+    // Need help here
     manifest = manifest + `
       CALL_METHOD
           Address("account_tdx_2_12yn74xkdhnj5tdqdr06wdke68f6vfs56c372fltg873j2avq759x3p")
