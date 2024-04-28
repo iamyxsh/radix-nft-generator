@@ -1,12 +1,41 @@
 <script lang="ts">
   import Button from "$lib/components/Button.svelte";
-  import {TransactionBuilder} from '@radixdlt/radix-engine-toolkit'
+  import {  rdt } from "$lib/stores";
+  import axios from 'axios'
+
 
   let name = ""
   let description = ""
   let image_uri = ""
 
+
+
   const submitMetadata = async () => {
+    let manifest = await axios.post("http://127.0.0.1:3000/manifest", {
+      name, description, image_uri
+    }).then(res => res.data)
+    manifest = manifest + `
+      CALL_METHOD
+          Address("account_tdx_2_12yn74xkdhnj5tdqdr06wdke68f6vfs56c372fltg873j2avq759x3p")
+          "try_deposit_batch_or_abort"
+          Expression("ENTIRE_WORKTOP")
+          Enum<0u8>()
+      ;
+    `
+    console.log(manifest)
+    const result = await $rdt!.walletApi.sendTransaction({
+      transactionManifest: manifest,
+    })
+
+if (result.isErr()) {
+  console.log(result)
+}
+
+await result.asyncMap((res) => {
+  console.log(res.transactionIntentHash)
+  return "" as any
+})
+
 
   }
 </script>
